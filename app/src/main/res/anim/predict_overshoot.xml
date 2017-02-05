@@ -3,6 +3,6 @@
     android:interpolator="@android:anim/anticipate_overshoot_interpolator">
     <translate
         android:duration="2000"
-        android:fromYDelta="-50%p"
+        android:fromYDelta="-25%p"
         android:toYDelta="0" />
 </set>

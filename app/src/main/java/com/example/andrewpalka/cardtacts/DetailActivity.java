@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
@@ -34,6 +35,23 @@ public class DetailActivity extends AppCompatActivity {
     private TextView workPhone, homePhone, mobilePhone, mobilePhone_HEAD;
     private TextView emailFill, websiteFill;
     private TextView street, city_state;
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable("contact", mContact);
+        super.onSaveInstanceState(outState);
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // restore saved Contact
+        mContact = savedInstanceState.getParcelable("contact");
+
+        super.onRestoreInstanceState(savedInstanceState);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +253,8 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
+
+        // Get favorites menu item, make it unclickable
         if(menu.getItem(0).getItemId() == R.id.action_favorite) {
 
             menu.findItem(R.id.action_favorite).setEnabled(false);

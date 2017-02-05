@@ -46,6 +46,40 @@ implements Recycler_View_Adapter.Adapter_OnClickHandler,
 
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("size", fullContactList.size());
+
+        for (int i = 0; i < fullContactList.size(); i++) {
+            String key = "contact_" + i;
+            outState.putParcelable(key, fullContactList.get(i));
+        }
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        int s = savedInstanceState.getInt("size");
+
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
+
+        for (int i = 0; i < s; i++) {
+            String key = "contact_" + i;
+            Contact c = savedInstanceState.getParcelable(key);
+            contactArrayList.add(c);
+        }
+
+        fullContactList = contactArrayList;
+
+
+
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

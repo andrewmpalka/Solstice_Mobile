@@ -24,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -266,6 +268,11 @@ implements Recycler_View_Adapter.Adapter_OnClickHandler,
             @Override
             public void deliverResult(ArrayList<Contact> data) {
                 mContactData = data;
+
+                if(null == data) {
+                    showErrorMessage();
+                }
+
                 super.deliverResult(data);
             }
         };
@@ -275,17 +282,24 @@ implements Recycler_View_Adapter.Adapter_OnClickHandler,
     @Override
     public void onLoadFinished(Loader<ArrayList<Contact>> loader, ArrayList<Contact> data) {
 
-        //TODO: SORT ALPHABETICALLY
+        Collections.sort(data, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact c1, Contact c2) {
+
+                String[] splitStr1 = c1.name.split("\\s+");
+                String[] splitStr2 = c2.name.split("\\s+");
+
+
+                return splitStr1[1].compareTo(splitStr2[1]);
+            }
+        });
 
 
         progressBar.setVisibility(View.INVISIBLE);
         mRecyclerViewAdapter.updateContactData(data);
 
-        if(null == data) {
-            showErrorMessage();
-        } else {
-            showRecyclerView();
-        }
+        showRecyclerView();
+
 
     }
 

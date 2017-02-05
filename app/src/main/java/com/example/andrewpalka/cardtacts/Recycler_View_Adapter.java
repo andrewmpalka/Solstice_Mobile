@@ -1,11 +1,8 @@
 package com.example.andrewpalka.cardtacts;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +34,7 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Ad
 
 
     /*
-     * An on-click handler that we've defined to make it easy for an Activity to interface with
+     * An on-click handler defined to make it easy for an Activity to interface with
      * our RecyclerView
      */
     private final Adapter_OnClickHandler mClickHandler;
@@ -49,12 +46,6 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Ad
         void onClick(Contact selectedContact);
     }
 
-    /**
-     * Creates a ForecastAdapter.
-     *
-     * @param clickHandler The on-click handler for this adapter. This single handler is called
-     *                     when an item is clicked.
-     */
     public Recycler_View_Adapter(Adapter_OnClickHandler clickHandler) {
         mClickHandler = clickHandler;
     }
@@ -142,28 +133,8 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Ad
     }
 
     public void updateContactData(List<Contact> data) {
-// TODO: THIS IS WHERE THE CONTACT LIST SHOULD BE UPDATING
-//        Log.d(TAG, "updateContactData: " + data.size());
-
         itemList = data;
-//        Log.d(TAG, "updateContactData: " + itemList.size());
         notifyDataSetChanged();
     }
-
-
-    /*
-        // Insert a new item to the RecyclerView on a predefined position
-        public void insert(int position, Data data) {
-            list.add(position, data);
-            notifyItemInserted(position);
-        }
-
-        // Remove a RecyclerView item containing a specified Data object
-        public void remove(Data data) {
-            int position = list.indexOf(data);
-            list.remove(position);
-            notifyItemRemoved(position);
-        }
-    */
 
 }

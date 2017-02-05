@@ -87,7 +87,7 @@ public class DetailActivity extends AppCompatActivity {
         city_state = (TextView) findViewById(R.id.tv_address_city_state);
 
 
-        // Get referenec to intent from MainActivity
+        // Get referene to intent from MainActivity
         Intent IntentThatStartedThisActivity = getIntent();
 
 

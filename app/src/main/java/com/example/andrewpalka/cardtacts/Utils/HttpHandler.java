@@ -1,5 +1,6 @@
 package com.example.andrewpalka.cardtacts.Utils;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -44,6 +45,7 @@ public class HttpHandler {
         return response;
     }
 
+    @NonNull
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();

@@ -1,8 +1,10 @@
 package com.example.andrewpalka.cardtacts;
 
-import android.os.AsyncTask;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,17 +18,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.andrewpalka.cardtacts.Model.Contact;
-import com.example.andrewpalka.cardtacts.Model.Data;
 import com.example.andrewpalka.cardtacts.Utils.HttpHandler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+implements Recycler_View_Adapter.Adapter_OnClickHandler,
+        android.support.v4.app.LoaderManager.LoaderCallbacks<ArrayList<Contact>> {
 
     private Boolean favoriteToggle = false;
     private ProgressBar progressBar;
@@ -37,8 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String TAG = MainActivity.class.getSimpleName();
 
-    private List <Contact> fullContactList;
+    private List<Contact> fullContactList;
     private ArrayList<Contact> favoriteContactList;
+
+    private static final int CONTACT_LOADER_ID = 0;
 
 
     @Override
@@ -53,15 +57,50 @@ public class MainActivity extends AppCompatActivity {
         favoriteContactList = new ArrayList<>();
 
 
-        //Populate dataset needed for recycler_view
-        List<Data> data = fill_with_data();
-
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         //Set adapter to custom RecyclerView.Adapter with loaded dataset
-        mRecyclerViewAdapter= new Recycler_View_Adapter(data, getApplication(), fullContactList);
+        mRecyclerViewAdapter = new Recycler_View_Adapter(getApplication(),this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        /*
+         * This setting improveS performance if you know that changes in content do not
+         * change the child layout size in the RecyclerView
+         */
+
+
+               /*
+         * This ID will uniquely identify the Loader. We can use it, for example, to get a handle
+         * on our Loader at a later point in time through the support LoaderManager.
+         */
+        int loaderId = CONTACT_LOADER_ID;
+
+    /*
+     * From MainActivity, we have implemented the LoaderCallbacks interface with the type of
+     * String array. (implements LoaderCallbacks<String[]>) The variable callback is passed
+     * to the call to initLoader below. This means that whenever the loaderManager has
+     * something to notify us of, it will do so through this callback.
+     */
+        android.support.v4.app.LoaderManager.LoaderCallbacks<ArrayList<Contact>> callback = MainActivity.this;
+
+    /*
+     * The second parameter of the initLoader method below is a Bundle. Optionally, you can
+     * pass a Bundle to initLoader that you can then access from within the onCreateLoader
+     * callback. In our case, we don't actually use the Bundle, but it's here in case we wanted
+     * to.
+     */
+        Bundle bundleForLoader = null;
+
+    /*
+     * Ensures a loader is initialized and active. If the loader doesn't already exist, one is
+     * created and (if the activity/fragment is currently started) starts the loader. Otherwise
+     * the last created loader is re-used.
+     */
+        getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
+
+        mRecyclerView.setHasFixedSize(true);
+
 
         progressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
@@ -76,12 +115,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Handles onCreate being called upon Orientation change
-        if (fullContactList.isEmpty() == false) {
+        if (!fullContactList.isEmpty()) {
             fullContactList.clear();
         }
 
         showRecyclerView();
-        new RetrieveFeedTask().execute();
+//        new RetrieveFeedTask().execute();
+
     }
 
     private void showRecyclerView() {
@@ -98,110 +138,131 @@ public class MainActivity extends AppCompatActivity {
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
-    //region CustomAsyncTask
-    class RetrieveFeedTask extends AsyncTask<Void, Void, Void> {
+    //region CustomAsyncTaskLoader
 
-        private Exception exception;
-        private String email;
+    @Override
+    public Loader<ArrayList<Contact>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<ArrayList<Contact>>(this) {
 
-        @Override protected void onPreExecute() {
-            super.onPreExecute();
 
-            progressBar.setVisibility(View.VISIBLE);
+                ArrayList<Contact> mContactData = null;
 
-            if (!favoriteToggle) {
-                setTitle(R.string.app_name);
-            } else {
-                setTitle("Favorites");
+            /**
+             * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
+             */
+
+            @Override
+            protected void onStartLoading() {
+                if (mContactData != null) {
+                    deliverResult(mContactData);
+                } else {
+                    mContactData = new ArrayList<>();
+                    forceLoad();
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+                super.onStartLoading();
             }
 
-        }
+            /**
+             * This is the method of the AsyncTaskLoader that will load and parse the JSON data
+             * from OpenWeatherMap in the background.
+             *
+             * @return Weather data from OpenWeatherMap as an array of Strings.
+             *         null if an error occurs
+             */
 
-        @Override protected Void doInBackground(Void... arg0) {
-
-            // Simple validation of URL
-
-            HttpHandler sh = new HttpHandler();
-
-            String endpointUrl = "https://s3.amazonaws.com/technical-challenge/Contacts.json";
-
-            // Making a request to url and getting response
-            String jsonStr = sh.makeServiceCall(endpointUrl);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-
-            if (jsonStr != null) {
-                try {
-
-                    JSONArray results = new JSONArray(jsonStr);
+            @Override
+            public ArrayList<Contact> loadInBackground() {
 
 
 
-                    // looping through All Contacts
-                    for (int i = 0; i < results.length(); i++) {
-                        JSONObject r = results.getJSONObject(i);
+                HttpHandler sh = new HttpHandler();
 
-                        Contact contact = new Contact(r);
+                String endpointUrl = "https://s3.amazonaws.com/technical-challenge/Contacts.json";
 
-                        fullContactList.add(contact);
+                // Making a request to url and getting response
+                String jsonStr = sh.makeServiceCall(endpointUrl);
+
+                Log.e(TAG, "Response from url: " + jsonStr);
+
+                if (jsonStr != null) {
+                    try {
+
+                        JSONArray results = new JSONArray(jsonStr);
+
+                        // looping through All Contacts
+                        for (int i = 0; i < results.length(); i++) {
+
+                            Log.d(TAG, "loadInBackground: LENGTH = " + results.length());
+
+                            JSONObject r = results.getJSONObject(i);
+                            Contact contact = new Contact(r);
+                            mContactData.add(contact);
+                        }
+                    } catch (final Exception e) {
+                        Log.e(TAG, "JSON parsing error: " + e.getMessage());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Json parsing error: " + e.getMessage(),
+                                        Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                        });
+                        return null;
                     }
-                } catch (final Exception e) {
 
-                    Log.e(TAG, "JSON parsing error: " + e.getMessage());
-
-
+                } else {
+                    Log.e(TAG, "Couldn't get json from server.");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
+                                    "Couldn't get json from server. Check LogCat for possible errors!",
                                     Toast.LENGTH_LONG)
                                     .show();
                         }
                     });
+                    return null;
                 }
-
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });
-
-            }
-//            }
-            return null;
-        }
-
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            progressBar.setVisibility(View.GONE);
-
-            if(fullContactList.isEmpty()) {
-                showErrorMessage();
-
-            } else {
-
-                  showRecyclerView();
-                Log.d(TAG, "onPostExecute: " + fullContactList.size());
-
-                // TODO: THIS IS WHERE THE FUNCTION THAT UPDATES THE CONTACT LIST IS CALLED
-                  mRecyclerViewAdapter.updateContactData(favoriteContactList);
-                Log.d(TAG, "onPostExecute: " + fullContactList.size());
-//                showMovieDataView();
-//                mRecyclerViewAdapter.setMovieData(itemList);
+                return mContactData;
             }
 
-        }
-
+            @Override
+            public void deliverResult(ArrayList<Contact> data) {
+                mContactData = data;
+                super.deliverResult(data);
+            }
+        };
 
     }
-    //endregion
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<Contact>> loader, ArrayList<Contact> data) {
+
+        //TODO: SORT ALPHABETICALLY
+
+
+        progressBar.setVisibility(View.INVISIBLE);
+        mRecyclerViewAdapter.updateContactData(data);
+
+        if(null == data) {
+            showErrorMessage();
+        } else {
+            showRecyclerView();
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<Contact>> loader) { }
+
+
+    private void invalidateData() {
+        mRecyclerViewAdapter.updateContactData(null);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -224,35 +285,17 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-//TODO: REPLACE WITH DATA
-    public List<Data> fill_with_data() {
 
-        List<Data> data = new ArrayList<>();
 
-        data.add(new Data("Batman vs Superman",
-                "Following the destruction of Metropolis, Batman embarks on a personal vendetta against Superman ",
-                R.drawable.ic_action_movie,
-                false));
-        data.add(new Data("X-Men: Apocalypse", "X-Men: Apocalypse is an upcoming American superhero" +
-                " film based on the X-Men characters that appear in Marvel Comics ",
-                R.drawable.ic_action_movie,
-                false));
-        data.add(new Data("Captain America: Civil War", "A feud between Captain America and Iron Man" +
-                " leaves the Avengers in turmoil.  ",
-                R.drawable.ic_action_movie,
-                true));
-        data.add(new Data("Kung Fu Panda 3", "After reuniting with his long-lost father, Po  must " +
-                "train a village of pandas",
-                R.drawable.ic_action_movie,
-                false));
-        data.add(new Data("Warcraft", "Fleeing their dying home to colonize another, fearsome orc " +
-                "warriors invade the peaceful realm of Azeroth. ",
-                R.drawable.ic_action_movie,
-                true));
-        data.add(new Data("Alice in Wonderland", "Alice in Wonderland: Through the Looking Glass ",
-                R.drawable.ic_action_movie
-                ,true));
+    @Override
+    public void onClick(Contact selectedContact) {
+        Context context = this;
+        Class destinationClass = DetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
 
-        return data;
+        intentToStartDetailActivity.putExtra("CONTACT_DETAILS", selectedContact);
+
+        startActivity(intentToStartDetailActivity);
     }
 }
+

@@ -96,4 +96,11 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="full_name">Full Name:</string>
+    <string name="company">Company:</string>
+    <string name="phone">Phone:</string>
+    <string name="work">Work</string>
+    <string name="email">Email:</string>
+    <string name="website">Website:</string>
+    <string name="address">Address:</string>
 </resources>

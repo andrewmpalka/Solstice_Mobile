@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,10 +8,209 @@
     tools:context="com.example.andrewpalka.cardtacts.DetailActivity"
     tools:showIn="@layout/activity_detail">
 
+    <!--PROFILE SECTION-->
+        <ImageView
+            android:id="@+id/iv_detail_image"
+            android:padding="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="16dp" />
+
+        <TextView
+            android:id="@+id/tv_name_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="@string/full_name"
+            android:textSize="12sp"
+            android:layout_toRightOf="@+id/iv_detail_image" />
+
+        <TextView
+            android:id="@+id/tv_name_fill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_name_head"
+            android:textSize="20sp"
+            android:layout_toRightOf="@+id/iv_detail_image" />
+
+        <TextView
+            android:id="@+id/tv_company_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_name_fill"
+            android:text="@string/company"
+            android:textSize="12sp"
+            android:layout_toRightOf="@+id/iv_detail_image" />
+
+        <TextView
+            android:id="@+id/tv_company_fill"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:layout_below="@id/tv_company_head"
+            android:layout_toRightOf="@+id/iv_detail_image"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/iv_detail_image"/>
+
+    <!--PHONE SECTION-->
+        <TextView
+            android:id="@+id/tv_phone_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_detail_image"
+            android:text="@string/phone"
+            android:textSize="12sp"
+            android:layout_marginLeft="16dp"
+            android:layout_alignParentLeft="true"/>
+
+        <TextView
+            android:id="@+id/tv_phone_work"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_phone_head"
+            android:text="@string/phone"
+            android:textSize="20sp"
+            android:layout_marginLeft="16dp"
+            android:layout_alignParentLeft="true"
+            android:onClick="callWork"/>
+
+        <TextView
+            android:id="@+id/tv_phone_work_head"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_phone_head"
+            android:layout_toRightOf="@id/tv_phone_work"
+            android:gravity="right"
+            android:text="@string/work"
+            android:textSize="12sp"
+            android:layout_marginRight="16dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBaseline="@id/tv_phone_work"
+            android:onClick="callWork"/>
+
+        <TextView
+            android:id="@+id/ET_phone_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_phone_work"
+            android:text="@string/phone"
+            android:textSize="20sp"
+            android:layout_marginLeft="16dp"
+            android:gravity="left"
+            android:onClick="callHome"/>
+
+        <TextView
+            android:id="@+id/ET_phone_home_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_phone_work_head"
+            android:layout_toRightOf="@id/ET_phone_home"
+            android:text="Home"
+            android:textSize="12sp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="right"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/ET_phone_home"
+            android:onClick="callHome"/>
+
+        <TextView
+            android:id="@+id/tv_phone_mobile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ET_phone_home"
+            android:text="@string/phone"
+            android:textSize="20sp"
+            android:layout_marginLeft="16dp"
+            android:layout_alignParentLeft="true"
+            android:onClick="callMobile"/>
+
+        <TextView
+            android:id="@+id/tv_phone_mobile_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ET_phone_home_head"
+            android:layout_toRightOf="@id/tv_phone_mobile"
+            android:text="Mobile"
+            android:textSize="12sp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="right"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/tv_phone_mobile"
+            android:onClick="callMobile"/>
+
+
+    <!--INTERNET SECTION-->
+        <TextView
+            android:id="@+id/tv_email_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_phone_mobile"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:textSize="12sp"
+            android:text="@string/email"/>
+        <TextView
+            android:id="@+id/tv_email_fill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_email_head"
+            android:layout_marginLeft="16dp"
+            android:text="@string/email"
+            android:textSize="20sp"
+            android:onClick="sendEmail"/>
+
+        <TextView
+            android:id="@+id/tv_website_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_email_fill"
+            android:layout_marginLeft="16dp"
+            android:text="@string/website"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/tv_website_fill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_website_head"
+            android:layout_marginLeft="16dp"
+            android:text="@string/email"
+            android:textSize="20sp"
+            android:onClick="goToWebsite"/>
+
+    <!--ADDRESS SECTION-->
     <TextView
+        android:id="@+id/tv_address_head"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/large_text" />
+        android:layout_below="@+id/tv_website_fill"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/address"
+        android:textSize="12sp"
+        android:onClick="navigate"/>
+    <TextView
+        android:id="@+id/tv_address_street"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_address_head"
+        android:layout_marginLeft="16dp"
+        android:text="@string/address"
+        android:textSize="20sp"
+        android:onClick="navigate"/>
+    <TextView
+        android:id="@+id/tv_address_city_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_address_street"
+        android:layout_marginLeft="16dp"
+        android:text="@string/address"
+        android:textSize="20sp"
+        android:onClick="navigate"/>
 
-</android.support.v4.widget.NestedScrollView>
+
+
+</RelativeLayout>

@@ -3,6 +3,7 @@ package com.example.andrewpalka.cardtacts;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,9 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.andrewpalka.cardtacts.Model.Contact;
-import com.example.andrewpalka.cardtacts.Model.Data;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,9 +25,8 @@ import java.util.List;
 /**
  * Created by andrewpalka on 2/3/17.
  */
-public class Recycler_View_Adapter extends RecyclerView.Adapter<View_Holder> {
+public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Adapter.View_Holder> {
 
-    List<Data> list = Collections.emptyList();
 
     List<Contact> itemList = Collections.emptyList();
 
@@ -33,10 +35,34 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<View_Holder> {
     private String TAG = Recycler_View_Adapter.class.getSimpleName();
 
 
-    public Recycler_View_Adapter(List<Data> list, Context context, List<Contact> itemList) {
-        this.list = list;
-        this.itemList = itemList;
+
+    /*
+     * An on-click handler that we've defined to make it easy for an Activity to interface with
+     * our RecyclerView
+     */
+    private final Adapter_OnClickHandler mClickHandler;
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface Adapter_OnClickHandler {
+        void onClick(Contact selectedContact);
+    }
+
+    /**
+     * Creates a ForecastAdapter.
+     *
+     * @param clickHandler The on-click handler for this adapter. This single handler is called
+     *                     when an item is clicked.
+     */
+    public Recycler_View_Adapter(Adapter_OnClickHandler clickHandler) {
+        mClickHandler = clickHandler;
+    }
+
+
+    public Recycler_View_Adapter(Context context, Adapter_OnClickHandler clickHandler) {
         this.context = context;
+        mClickHandler = clickHandler;
     }
 
     @Override
@@ -59,32 +85,12 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<View_Holder> {
         //Use the provided View Holder on the onCreateViewHolder method to populate the current row on the RecyclerView
 
 
-        if (getItemCount() > list.size()) {
-
             holder.title.setText( itemList.get(position).name);
-            holder.description.setText(itemList.get(position).company);
+            holder.description.setText(itemList.get(position).phone.getPhone(0));
 
-
-        }
-        holder.title.setText(list.get(position).title);
-        holder.description.setText(list.get(position).description);
-//        holder.imageView.setImageResource(list.get(position).imageId);
-
-        Picasso.with(context).load("http://i.imgur.com/DvpvklR.png")
-                .placeholder(list.get(position).imageId)
+        Picasso.with(context).load(itemList.get(position).imageURL.getLargeImgURL())
+                .placeholder(R.drawable.ic_action_movie)
                 .into(holder.imageView);
-
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                            Context context = v.getContext();
-                            Intent intent = new Intent(context, DetailActivity.class);
-//                            intent.putExtra(ContactDetailFragment.ARG_ITEM_ID, holder.mItem.id)
-                            context.startActivity(intent);
-                    }
-                });
-
 
     }
 
@@ -94,15 +100,39 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<View_Holder> {
         viewHolder.itemView.setAnimation(animAnticipateOvershoot);
     }
 
+
+    public class View_Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        public final CardView card;
+        public final TextView title;
+        public final TextView description;
+        public final ImageView imageView;
+
+
+        View_Holder(View itemView) {
+            super(itemView);
+            card = (CardView) itemView.findViewById(R.id.cardView);
+            title = (TextView) itemView.findViewById(R.id.title);
+            description = (TextView) itemView.findViewById(R.id.description);
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+        int adapterPosition = getAdapterPosition();
+            Contact selectedContact = itemList.get(adapterPosition);
+            mClickHandler.onClick(selectedContact);
+
+        }
+    }
+
     @Override
     public int getItemCount() {
         //returns the number of elements the RecyclerView will display
-        if (itemList.isEmpty()) {
-            Log.d(TAG, "getItemCount: " + itemList.size());
-            return list.size();
-        }
-
-
+        if (itemList == null ) return 0;
         return itemList.size();
     }
 
@@ -111,26 +141,29 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<View_Holder> {
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    public void updateContactData(ArrayList<Contact> data) {
+    public void updateContactData(List<Contact> data) {
 // TODO: THIS IS WHERE THE CONTACT LIST SHOULD BE UPDATING
-        Log.d(TAG, "updateContactData: " + data.size());
+//        Log.d(TAG, "updateContactData: " + data.size());
 
         itemList = data;
-        Log.d(TAG, "updateContactData: " + itemList.size());
+//        Log.d(TAG, "updateContactData: " + itemList.size());
         notifyDataSetChanged();
     }
 
-    // Insert a new item to the RecyclerView on a predefined position
-    public void insert(int position, Data data) {
-        list.add(position, data);
-        notifyItemInserted(position);
-    }
 
-    // Remove a RecyclerView item containing a specified Data object
-    public void remove(Data data) {
-        int position = list.indexOf(data);
-        list.remove(position);
-        notifyItemRemoved(position);
-    }
+    /*
+        // Insert a new item to the RecyclerView on a predefined position
+        public void insert(int position, Data data) {
+            list.add(position, data);
+            notifyItemInserted(position);
+        }
+
+        // Remove a RecyclerView item containing a specified Data object
+        public void remove(Data data) {
+            int position = list.indexOf(data);
+            list.remove(position);
+            notifyItemRemoved(position);
+        }
+    */
 
 }

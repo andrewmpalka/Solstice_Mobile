@@ -12,6 +12,7 @@
         <ImageView
             android:id="@+id/iv_detail_image"
             android:padding="16dp"
+            android:scaleType="fitCenter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

@@ -15,55 +15,46 @@ import com.example.andrewpalka.cardtacts.Model.Contact;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by andrewpalka on 2/3/17.
  */
-public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Adapter.View_Holder> {
+public class ContactListRecyclerViewAdapter extends RecyclerView.Adapter<ContactListRecyclerViewAdapter.ContactViewHolder> {
 
 
-    List<Contact> itemList = Collections.emptyList();
+    private List<Contact> mItemList = Collections.emptyList();
 
-    Context context;
+    private Context mContext;
 
-    private String TAG = Recycler_View_Adapter.class.getSimpleName();
+    private String TAG = ContactListRecyclerViewAdapter.class.getSimpleName();
+
+    private final AdapterOnClickHandler mClickHandler;
 
 
+    public interface AdapterOnClickHandler {
 
-    /*
-     * An on-click handler defined to make it easy for an Activity to interface with
-     * our RecyclerView
-     */
-    private final Adapter_OnClickHandler mClickHandler;
-
-    /**
-     * The interface that receives onClick messages.
-     */
-    public interface Adapter_OnClickHandler {
         void onClick(Contact selectedContact);
+
     }
 
-    public Recycler_View_Adapter(Adapter_OnClickHandler clickHandler) {
-        mClickHandler = clickHandler;
-    }
+    public ContactListRecyclerViewAdapter(Context context, AdapterOnClickHandler clickHandler) {
 
-
-    public Recycler_View_Adapter(Context context, Adapter_OnClickHandler clickHandler) {
-        this.context = context;
+        this.mContext = context;
         mClickHandler = clickHandler;
+
     }
 
     @Override
-    public View_Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         //Inflate the layout, initialize the View Holder
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.activity_main_row, parent, false);
-        View_Holder holder = new View_Holder(v);
+        ContactViewHolder holder = new ContactViewHolder(v);
 
-        animate(holder);
+//        animate(holder);
 
 
         return holder;
@@ -71,28 +62,34 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Ad
     }
 
     @Override
-    public void onBindViewHolder(View_Holder holder, int position) {
+    public void onBindViewHolder(ContactViewHolder holder, int position) {
 
         //Use the provided View Holder on the onCreateViewHolder method to populate the current row on the RecyclerView
+        holder.title.setText(mItemList.get(position).name);
+
+        String[] splitStr = mItemList.get(position).phone.getWork().split("-");
+        String s = "(" + splitStr[0] + ") " + splitStr[1] + "-" + splitStr[2];
+
+        holder.description.setText(s);
 
 
-            holder.title.setText( itemList.get(position).name);
-            holder.description.setText(itemList.get(position).phone.getPhone(0));
-
-        Picasso.with(context).load(itemList.get(position).imageURL.getLargeImgURL())
-                .placeholder(R.drawable.ic_action_movie)
+        Picasso.with(mContext).load(mItemList.get(position).imageURL.getSmallImgURL())
+                .placeholder(R.drawable.ic_action_name)
+                .resize(120,120)
                 .into(holder.imageView);
 
     }
 
     public void animate(RecyclerView.ViewHolder viewHolder) {
 
-        final Animation animAnticipateOvershoot = AnimationUtils.loadAnimation(context, R.anim.bounce_interpolator);
+        final Animation animAnticipateOvershoot = AnimationUtils.loadAnimation(mContext,
+                R.anim.bounce_interpolator);
         viewHolder.itemView.setAnimation(animAnticipateOvershoot);
+
     }
 
 
-    public class View_Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ContactViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public final CardView card;
         public final TextView title;
@@ -100,8 +97,11 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Ad
         public final ImageView imageView;
 
 
-        View_Holder(View itemView) {
+        ContactViewHolder(View itemView) {
+
             super(itemView);
+
+
             card = (CardView) itemView.findViewById(R.id.cardView);
             title = (TextView) itemView.findViewById(R.id.title);
             description = (TextView) itemView.findViewById(R.id.description);
@@ -113,28 +113,35 @@ public class Recycler_View_Adapter extends RecyclerView.Adapter<Recycler_View_Ad
 
         @Override
         public void onClick(View view) {
+
         int adapterPosition = getAdapterPosition();
-            Contact selectedContact = itemList.get(adapterPosition);
-            mClickHandler.onClick(selectedContact);
+        Contact selectedContact = mItemList.get(adapterPosition);
+         mClickHandler.onClick(selectedContact);
 
         }
     }
 
     @Override
     public int getItemCount() {
+
         //returns the number of elements the RecyclerView will display
-        if (itemList == null ) return 0;
-        return itemList.size();
+        if (mItemList == null ) return 0;
+
+        return mItemList.size();
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+
         super.onAttachedToRecyclerView(recyclerView);
+
     }
 
     public void updateContactData(List<Contact> data) {
-        itemList = data;
+
+        mItemList = data;
         notifyDataSetChanged();
+
     }
 
 }

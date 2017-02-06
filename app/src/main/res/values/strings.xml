@@ -103,4 +103,6 @@
     <string name="email">Email:</string>
     <string name="website">Website:</string>
     <string name="address">Address:</string>
+    <string name="favorites">Favorites</string>
+    <string name="refresh">Refresh</string>
 </resources>

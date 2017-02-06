@@ -59,6 +59,7 @@ implements ContactListRecyclerViewAdapter.AdapterOnClickHandler,
 
         NetworkInfo[] netInfo = cm.getAllNetworkInfo();
 
+        // closest thing to fast enumeration :)
         for (NetworkInfo ni : netInfo) {
 
             if (ni.getTypeName().equalsIgnoreCase("WIFI"))
@@ -158,7 +159,7 @@ implements ContactListRecyclerViewAdapter.AdapterOnClickHandler,
         android.support.v4.app.LoaderManager.LoaderCallbacks<ArrayList<Contact>> callback
                 = MainActivity.this;
 
-        // unused for conveniene
+        // unused for convenience
         Bundle bundleForLoader = null;
 
         // ensures a loader is active
@@ -321,6 +322,7 @@ implements ContactListRecyclerViewAdapter.AdapterOnClickHandler,
     @Override
     public void onLoadFinished(Loader<ArrayList<Contact>> loader, ArrayList<Contact> data) {
 
+        // Anonymous class used to sort Contact data alphabetically
         Collections.sort(data, new Comparator<Contact>() {
 
             @Override

@@ -58,6 +58,7 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -115,7 +116,7 @@ public class DetailActivity extends AppCompatActivity {
 
         }
 
-        // Last minute fix since Picasso scales placeholder on Josephine
+        // Last minute fix since Picasso scales down placeholder on Josephine
         if(mContact.imageURL.getLargeImgURL().equals("https://s3.amazonaws.com/technical-challenge/images/image12_large.jpeg")) {
 
             mContactImage.setPadding(180,150,180,150);
@@ -300,10 +301,10 @@ public class DetailActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_detail, menu);
 
 
-        if(mContact.favorite == 0d) {
-            menu.getItem(0).setIcon(R.drawable.ic_action_favorite_empty);
-        } else {
+        if(mContact.favorite == 1d) {
             menu.getItem(0).setIcon(R.drawable.ic_action_favorite_full);
+        } else {
+            menu.getItem(0).setIcon(R.drawable.ic_action_favorite_empty);
         }
 
 
